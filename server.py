@@ -25,7 +25,7 @@ def termthread(conn, man, thisID):
             for c in m.getWeb(thisID):
                 c.send(dataString)
         
-        print "Sent " + dataString + " To " + thisID
+        print "Received " + dataString + " To " + thisID
      
     #Come out of loo
     conn.close()
@@ -102,7 +102,7 @@ class ConManager:
 #===============================================================
 
 HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8886 # Arbitrary non-privileged port
+PORT = 8083 # Arbitrary non-privileged port
  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 m = ConManager() #this will store and fetch active connections based on a unique ID
@@ -129,7 +129,15 @@ while 1:
     
     #check to see what kind of connection.
     greeting = conn.recv(1024)
-    greeting = Message(greeting)
+    
+    #Test that the client is correctly formatting messages.
+    try:
+        greeting = Message(greeting) #must be a JSON string
+        greeting.getType() #must have a type feild.
+    except:
+        conn.close()
+        print "Closed connection: " + addr[0] + " Bad formatting."
+        continue
 
     if greeting.getType() == "NEWTERM":
         thisID = idGenerator()

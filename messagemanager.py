@@ -11,10 +11,12 @@ class MsgGen:
 	def setID(self, UID):
 		self.id = UID
 	def addMessage(self, message):
+		#must have set an ID to call message function
 		self.data['message'] = message
 		self.data['time'] = int(time.time())
+		self.data['uid'] = self.id
 	def pack(self):
-		return json.dumps(self.data) + "\n"
+		return json.dumps(self.data)
 	def wipe(self):
 		self.data = {}
 	def newTerm(self):

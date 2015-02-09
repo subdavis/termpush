@@ -24,7 +24,7 @@ class Async:
 #===============================================================
 
 HOST = 'localhost'
-PORT = 8886
+PORT = 8081
 SIZE = 1024 # the size in bytes to accept from the server.
 #connect to the sock server.
 csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,8 +57,8 @@ msg.wipe()
 #Start reading STDIN to send
 while 1:
 	stdin = raw_input()
-	msg.addMessage(stdin)
 	msg.setID(uid)
+	msg.addMessage(stdin)
 	msg.addType("NORMAL")
 	csock.send(msg.pack())
 	msg.wipe()
