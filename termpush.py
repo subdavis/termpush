@@ -24,7 +24,7 @@ class Async:
 #===============================================================
 
 HOST = 'localhost'
-PORT = 8882
+PORT = 8886
 SIZE = 1024 # the size in bytes to accept from the server.
 #connect to the sock server.
 csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,13 +41,15 @@ msg = MsgGen()
 #let's write a message to introduce ourselves.
 firstMessage = MsgGen()
 firstMessage.newTerm()
-csock.send(firstMessage.pack())
+firstMessage = firstMessage.pack()
+print firstMessage
+csock.send(firstMessage)
 #expected that server waits for connection to be NEW and then replies with a UID
 greeting = csock.recv(SIZE)
 #parse the greeting and tell MsgGen what the ID we should use is.
 #idea: have the server also generate a passkey to keep spammers from spamming randomly generated IDS.
 greeting = Message(greeting)
-uid = greetng.getID()
+uid = greeting.getID()
 print "Your UID is " + uid
 
 msg.wipe()
@@ -56,6 +58,8 @@ msg.wipe()
 while 1:
 	stdin = raw_input()
 	msg.addMessage(stdin)
+	msg.setID(uid)
+	msg.addType("NORMAL")
 	csock.send(msg.pack())
 	msg.wipe()
 	#consider letting async handle all message send / receive

@@ -30,7 +30,7 @@ def termthread(conn, man, thisID):
     #Come out of loo
     conn.close()
     m.delTerm(thisID)
-    print thisID + "Closed the connection"
+    print thisID + " closed the connection"
 
 #This will be created as a new thread for WEB clients
 def webthread(conn, man, thisID):
@@ -55,7 +55,7 @@ def webthread(conn, man, thisID):
     #Come out of loop
     conn.close()
     m.delWeb(thisID)
-    print thisID + "Closed the connection"
+    print thisID + " closed the connection"
 
 #obvs for unique IDs    
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):

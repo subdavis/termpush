@@ -13,8 +13,6 @@ class MsgGen:
 	def addMessage(self, message):
 		self.data['message'] = message
 		self.data['time'] = int(time.time())
-		self.data['uid'] = self.id
-		self.addType("NORMAL")
 	def pack(self):
 		return json.dumps(self.data) + "\n"
 	def wipe(self):
