@@ -24,8 +24,7 @@ def termthread(conn, man, thisID, db):
         if not (m.getWeb(thisID) == None):
             for c in m.getWeb(thisID):
                 c.send(dataString)
-        
-        print "Received " + dataString + " To " + thisID
+
         db.insertLine(data)
      
     #Come out of loo

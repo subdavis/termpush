@@ -53,9 +53,8 @@ uid = greeting.getID()
 print "Your UID is " + uid
 
 msg.wipe()
-
 #Start reading STDIN to send
-while 1:
+while True:
 	stdin = raw_input()
 	msg.setID(uid)
 	msg.addMessage(stdin)
@@ -63,3 +62,5 @@ while 1:
 	csock.send(msg.pack())
 	msg.wipe()
 	#consider letting async handle all message send / receive
+	#Strongly consider queueing data for send so that the buffers aren't overloaded.
+	#have a look for that progress bar thingy.
