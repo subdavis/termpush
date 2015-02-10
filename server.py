@@ -9,54 +9,29 @@ from messagemanager import *
 from database import Database
 
 #This will be created as a new thread for TERM clients
-def termthread(conn, man, thisID, db):
+def termthread(sh, man, thisID, db):
     #infinite loop so that function do not terminate and thread do not end.
     while True:
-         
         #Receiving from client
-        data = conn.recv(1024)
-        dataString = data + ""
-        #Do JSON parsing with the Message class
-        
-        if not data: #find out how this works.
-            break
-        #find the right recipients
-        if not (m.getWeb(thisID) == None):
-            for c in m.getWeb(thisID):
-                c.send(dataString)
+        message = sh.rcvNext()
 
-        db.insertLine(data)
+        #find the right recipients
+        if not (man.getWeb(thisID) == None):
+            for c in man.getWeb(thisID):
+                c.send(message)
+
+        db.insertLine(message)
      
-    #Come out of loo
-    conn.close()
-    m.delTerm(thisID)
+    #Come out of loop
+    sh.close() # tell the handler to close the connection
+    del sh # remove the handler
+    man.delTerm(thisID)
     print thisID + " closed the connection"
 
 #This will be created as a new thread for WEB clients
-def webthread(conn, man, thisID, db):
-    SIZE = 1024
-
-    #this is where we do JSON PARSING for the welcome message
-    
-    #infinite loop so that function do not terminate and thread do not end.
-    while True:
-         
-        #Receiving from client
-        data = conn.recv(SIZE)
-        #Do JSON parsing with the Message class
-        
-        if not data: #find out how this works.
-            break
-        #find the right recipients
-        for c in m.getTerm(thisID):
-            c.send(sendString)
-        print "Sent " + sendString + " To " + thisID
-     
-    #Come out of loop
-    conn.close()
-    m.delWeb(thisID)
-    print thisID + " closed the connection"
-
+def webthread(SockHandler, man, thisID, db):
+    #don't even call this yet.  It isn't ready
+    print "don't use me"
 #obvs for unique IDs    
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -65,7 +40,6 @@ class ConManager:
     #This class is for keeping together multiple web connections on the same feed
     #Rememebr what web clients want what data.
     #maybe make this singleton later?  I'll only ever have one, then I wont have to pass the fucker around as an arg.
-
 
     def __init__(self):
         self.webCons = {'000000' : None}
@@ -97,6 +71,33 @@ class ConManager:
         if uid in self.termCons:
             return self.termCons[uid]
         else: return None
+
+#Receive whole messages instead 
+#This should be a CLASS, and each connection should get their OWN.
+#Functions so that each class can rememeber the conn and buffer without needing to include as an ARG
+#Relies on a protocol that sends '\n' at the end of each message.
+class SocketHandler:
+
+    def __inti__(self, conn):
+        self.conn = conn
+        self.buff = ""
+
+    def rcvNext(self):
+        #While the buffer does not contain a newline string, keep asking for new data.
+        while (self.buff.index('\n') == -1):
+            #this will be where each thread should hang and wait for data
+            data = self.conn.recv()
+            if not data:
+                #called if connection closes.
+                return ""
+            self.buff += data
+        end = self.buff.index('\n')
+        message = self.buff[:end]
+        self.buff = self.buff[end:]
+        return message
+    def close(self):
+        self.conn.close()
+
 #===============================================================
 #               Begin the main program
 #===============================================================
@@ -130,7 +131,9 @@ while 1:
     print 'Connected with ' + addr[0] + ':' + str(addr[1])
     
     #check to see what kind of connection.
-    greeting = conn.recv(1024)
+    #rewritten to use the new SockHandler Class and protocol
+    sh = SockHandler(conn)
+    greeting = sh.rcvNext() #will crash if no newline char is ever sent.  Fix that.
     
     #Test that the client is correctly formatting messages.
     try:
@@ -149,10 +152,10 @@ while 1:
         conn.send(reply)
         m.addTerm(thisID, conn)
         db.addID(thisID)
-        start_new_thread(termthread ,(conn, m, thisID, db))
+        start_new_thread(termthread ,(sh, m, thisID, db))
     elif greeting.getType() == "NEWWEB":
         thisID = greeting.getID()
-        start_new_thread(webthread ,(conn, m, thisID, db))
+        start_new_thread(webthread ,(sh, m, thisID, db))
     else:
         print "Client NOT speaking my protocol."
  
