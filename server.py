@@ -4,12 +4,12 @@ import string
 import random
 import json
 from thread import *
+#These are my custom-written helper classes.
 from messagemanager import *
+from database import Database
 
 #This will be created as a new thread for TERM clients
-def termthread(conn, man, thisID):
-    #this is where we do JSON PARSING for the welcome message
-     
+def termthread(conn, man, thisID, db):
     #infinite loop so that function do not terminate and thread do not end.
     while True:
          
@@ -26,6 +26,7 @@ def termthread(conn, man, thisID):
                 c.send(dataString)
         
         print "Received " + dataString + " To " + thisID
+        db.insertLine(data)
      
     #Come out of loo
     conn.close()
@@ -33,11 +34,11 @@ def termthread(conn, man, thisID):
     print thisID + " closed the connection"
 
 #This will be created as a new thread for WEB clients
-def webthread(conn, man, thisID):
+def webthread(conn, man, thisID, db):
     SIZE = 1024
 
     #this is where we do JSON PARSING for the welcome message
-     
+    
     #infinite loop so that function do not terminate and thread do not end.
     while True:
          
@@ -63,7 +64,7 @@ def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
 
 class ConManager:
     #This class is for keeping together multiple web connections on the same feed
-    # Rememebr what web clients want what data.
+    #Rememebr what web clients want what data.
     #maybe make this singleton later?  I'll only ever have one, then I wont have to pass the fucker around as an arg.
 
 
@@ -102,10 +103,12 @@ class ConManager:
 #===============================================================
 
 HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8083 # Arbitrary non-privileged port
+PORT = 8888 # Arbitrary non-privileged port
  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 m = ConManager() #this will store and fetch active connections based on a unique ID
+db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
+
 print 'Socket created'
  
 #Bind socket to local host and port
@@ -116,11 +119,11 @@ except socket.error as msg:
     sys.exit()
      
 print 'Socket bind complete'
- 
+
 #Start listening on socket
 s.listen(10)
-print 'Socket now listening'
- 
+print 'Socket now listening on ' + str(PORT)
+
 #now keep talking with the client
 while 1:
     #wait to accept a connection - blocking call
@@ -146,11 +149,12 @@ while 1:
         reply = reply.pack()
         conn.send(reply)
         m.addTerm(thisID, conn)
-        start_new_thread(termthread ,(conn, m, thisID))
+        db.addID(thisID)
+        start_new_thread(termthread ,(conn, m, thisID, db))
     elif greeting.getType() == "NEWWEB":
         thisID = greeting.getID()
-        start_new_thread(webthread ,(conn, m, thisID))
+        start_new_thread(webthread ,(conn, m, thisID, db))
     else:
-        print "What the fuck is even trying to talk to me??"
+        print "Client NOT speaking my protocol."
  
 s.close()

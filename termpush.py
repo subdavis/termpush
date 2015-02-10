@@ -23,8 +23,8 @@ class Async:
 #				Setup variables and start the connection
 #===============================================================
 
-HOST = 'localhost'
-PORT = 8081
+HOST = 'ocean.redspin.net'
+PORT = 8888
 SIZE = 1024 # the size in bytes to accept from the server.
 #connect to the sock server.
 csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
