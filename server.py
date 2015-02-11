@@ -32,6 +32,7 @@ def termthread(sh, man, thisID, db):
 def webthread(SockHandler, man, thisID, db):
     #don't even call this yet.  It isn't ready
     print "don't use me"
+
 #obvs for unique IDs    
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
