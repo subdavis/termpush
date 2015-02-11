@@ -2,9 +2,13 @@
 This is a project started by @subdavis for sending output from a console to the web in real time.  It will generate a link and feed all future output to that link (like pastebin)
 
 ###Uses:
+```
 ~$ somecommand | termpush 
+```
 Watch page update in realtime as your terminal process runs.
+```
 ~$ cat somefile | termpush 
+```
 Quick and easy way to publish a paste and get a link all in one command
 
 ###Planned Features:
