@@ -2,7 +2,7 @@ import socket
 import json
 import time
 from thread import *
-from messagemanager import *
+from sockmanager import *
 
 #this will be called as a thread.  We will ignore this for now.
 def listen(csocket, async):
@@ -33,6 +33,7 @@ csock.connect((HOST, PORT))
 async = Async()
 #this will be recycled for each line of input.  Dont waste memory!
 msg = MsgGen()
+sh = SocketHandler(csock)
 
 #===============================================================
 #				Begin actually doing things
@@ -45,10 +46,10 @@ firstMessage = firstMessage.pack()
 print firstMessage
 csock.send(firstMessage)
 #expected that server waits for connection to be NEW and then replies with a UID
-greeting = csock.recv(SIZE)
-#parse the greeting and tell MsgGen what the ID we should use is.
+greeting = sh.rcvNext()
+
 #idea: have the server also generate a passkey to keep spammers from spamming randomly generated IDS.
-greeting = Message(greeting)
+
 uid = greeting.getID()
 print "Your UID is " + uid
 

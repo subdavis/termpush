@@ -5,7 +5,7 @@ import random
 import json
 from thread import *
 #These are my custom-written helper classes.
-from messagemanager import *
+from sockmanager import *
 from database import Database
 
 #This will be created as a new thread for TERM clients
@@ -14,13 +14,14 @@ def termthread(sh, man, thisID, db):
     while True:
         #Receiving from client
         message = sh.rcvNext()
-
-        #find the right recipients
-        if not (man.getWeb(thisID) == None):
-            for c in man.getWeb(thisID):
-                c.send(message)
-
-        db.insertLine(message)
+        if not (message == "\0"):
+            #find the right recipients
+            if not (man.getWeb(thisID) == None):
+                for c in man.getWeb(thisID):
+                    c.send(message.getRaw())
+            print message.getRaw()
+            db.insertLine(message.getRaw())
+        else: break
      
     #Come out of loop
     sh.close() # tell the handler to close the connection
@@ -73,32 +74,6 @@ class ConManager:
             return self.termCons[uid]
         else: return None
 
-#Receive whole messages instead 
-#This should be a CLASS, and each connection should get their OWN.
-#Functions so that each class can rememeber the conn and buffer without needing to include as an ARG
-#Relies on a protocol that sends '\n' at the end of each message.
-class SocketHandler:
-
-    def __inti__(self, conn):
-        self.conn = conn
-        self.buff = ""
-
-    def rcvNext(self):
-        #While the buffer does not contain a newline string, keep asking for new data.
-        while (self.buff.index('\n') == -1):
-            #this will be where each thread should hang and wait for data
-            data = self.conn.recv()
-            if not data:
-                #called if connection closes.
-                return ""
-            self.buff += data
-        end = self.buff.index('\n')
-        message = self.buff[:end]
-        self.buff = self.buff[end:]
-        return message
-    def close(self):
-        self.conn.close()
-
 #===============================================================
 #               Begin the main program
 #===============================================================
@@ -133,17 +108,8 @@ while 1:
     
     #check to see what kind of connection.
     #rewritten to use the new SockHandler Class and protocol
-    sh = SockHandler(conn)
-    greeting = sh.rcvNext() #will crash if no newline char is ever sent.  Fix that.
-    
-    #Test that the client is correctly formatting messages.
-    try:
-        greeting = Message(greeting) #must be a JSON string
-        greeting.getType() #must have a type feild.
-    except:
-        conn.close()
-        print "Closed connection: " + addr[0] + " Bad formatting."
-        continue
+    sh = SocketHandler(conn)
+    greeting = sh.rcvNext() #returns message OBJECT.
 
     if greeting.getType() == "NEWTERM":
         thisID = idGenerator()
@@ -159,5 +125,5 @@ while 1:
         start_new_thread(webthread ,(sh, m, thisID, db))
     else:
         print "Client NOT speaking my protocol."
- 
+
 s.close()
