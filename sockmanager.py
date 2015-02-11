@@ -28,8 +28,10 @@ class MsgGen:
 		self.addType("ACKNEW")
 		self.addMessage("NULL")
 
+#this will do JSON parsing and packing for messages.
+#Mainly this will safely throw an error if a message is unsanitary.
+#Add proper error handling later so that clients can be kicked for sending bad messages.
 class Message:
-    #this will do JSON parsing and packing for messages.
     def __init__(self, rawMessage):
         #set each element of the message to a dictionary using the parsed JSON\
         self.raw = rawMessage[:(len(rawMessage)-1)]
@@ -69,5 +71,6 @@ class SocketHandler:
         message = self.buff[:end+1] #include the breaking character so that message handles it.
         self.buff = self.buff[end+1:]
         return Message(message)
+
     def close(self):
         self.conn.close()

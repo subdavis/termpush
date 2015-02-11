@@ -2,7 +2,6 @@ import socket
 import sys
 import string
 import random
-import json
 from thread import *
 #These are my custom-written helper classes.
 from sockmanager import *
@@ -77,53 +76,54 @@ class ConManager:
 #===============================================================
 #               Begin the main program
 #===============================================================
-
-HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
- 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-m = ConManager() #this will store and fetch active connections based on a unique ID
-db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
-
-print 'Socket created'
- 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-     
-print 'Socket bind complete'
-
-#Start listening on socket
-s.listen(10)
-print 'Socket now listening on ' + str(PORT)
-
-#now keep talking with the client
-while 1:
-    #wait to accept a connection - blocking call
-    conn, addr = s.accept()
-    print 'Connected with ' + addr[0] + ':' + str(addr[1])
+if __name__=="__main__":
     
-    #check to see what kind of connection.
-    #rewritten to use the new SockHandler Class and protocol
-    sh = SocketHandler(conn)
-    greeting = sh.rcvNext() #returns message OBJECT.
+    HOST = ''   # Symbolic name meaning all available interfaces
+    PORT = 8888 # Arbitrary non-privileged port
+     
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    m = ConManager() #this will store and fetch active connections based on a unique ID
+    db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
 
-    if greeting.getType() == "NEWTERM":
-        thisID = idGenerator()
-        reply = MsgGen()
-        reply.newTermReply(thisID)
-        reply = reply.pack()
-        conn.send(reply)
-        m.addTerm(thisID, conn)
-        db.addID(thisID)
-        start_new_thread(termthread ,(sh, m, thisID, db))
-    elif greeting.getType() == "NEWWEB":
-        thisID = greeting.getID()
-        start_new_thread(webthread ,(sh, m, thisID, db))
-    else:
-        print "Client NOT speaking my protocol."
+    print 'Socket created'
+     
+    #Bind socket to local host and port
+    try:
+        s.bind((HOST, PORT))
+    except socket.error as msg:
+        print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+        sys.exit()
+         
+    print 'Socket bind complete'
 
-s.close()
+    #Start listening on socket
+    s.listen(10)
+    print 'Socket now listening on ' + str(PORT)
+
+    #now keep talking with the client
+    while 1:
+        #wait to accept a connection - blocking call
+        conn, addr = s.accept()
+        print 'Connected with ' + addr[0] + ':' + str(addr[1])
+        
+        #check to see what kind of connection.
+        #rewritten to use the new SockHandler Class and protocol
+        sh = SocketHandler(conn)
+        greeting = sh.rcvNext() #returns message OBJECT.
+
+        if greeting.getType() == "NEWTERM":
+            thisID = idGenerator()
+            reply = MsgGen()
+            reply.newTermReply(thisID)
+            reply = reply.pack()
+            conn.send(reply)
+            m.addTerm(thisID, conn)
+            db.addID(thisID)
+            start_new_thread(termthread ,(sh, m, thisID, db))
+        elif greeting.getType() == "NEWWEB":
+            thisID = greeting.getID()
+            start_new_thread(webthread ,(sh, m, thisID, db))
+        else:
+            print "Client NOT speaking my protocol."
+
+    s.close()
