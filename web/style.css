@@ -8,10 +8,30 @@
 }
 .title{
 	font-family: Consolas, monaco, monospace;
-	font-size: 24px;
+	font-size: 26px;
 	text-align: center;
 	padding-top: 8px;
 	padding-bottom: 4px;
+	border-left: 5px solid;
+}
+.menu-item{
+	font-family: Consolas, monaco, monospace;
+	font-size: 18px;
+	text-align: left;
+	padding-top: 8px;
+	padding-bottom: 4px;
+	padding-left: 25px;
+	border-left: 5px solid;
+}
+.menu-item:hover{
+	border-left: 0px solid;
+	padding-left: 30px;
+}
+.menu-link{
+	text-decoration: none;
+}
+.menu-link:hover{
+	text-decoration: none;
 }
 .sidebar-cmd{
 	font-family: Consolas, monaco, monospace;
@@ -58,4 +78,16 @@
 	margin-left: 160px;
 	position: absolute;
 	z-index: 10;
+}*/
+.red{
+	color:#DE5C9D;
+}
+.green{
+	color: #71C671;
+}
+.blue{
+	color: #5C85FF;
+}
+.yellow{
+	color: #FFD119;
 }
