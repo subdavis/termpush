@@ -1,0 +1,54 @@
+.pane-left{
+	margin-left: 0px;
+	width: 160px;
+	background: black;
+	position: fixed;
+	height: 100%;
+	color: white;
+}
+.title{
+	font-family: Consolas, monaco, monospace;
+	font-size: 24px;
+	text-align: center;
+	padding-top: 6px;
+	padding-bottom: 15px;
+}
+.pane-content{
+	margin-left: 160px;
+	background: #3B3A32;
+	height:100%;
+	padding-top: 6px;
+	padding-bottom: 15px;
+}
+.code-table{
+	font-family: Consolas, monaco, monospace;
+	font-size: 15px;
+	color: #E3E3E3;
+	width: 100%;
+}
+.code-table td{
+	padding-left: 6px;
+	padding-right: 6px;
+}
+.numbering{
+	width: 25px;
+	text-align: center;
+	color: #A1A1A1 !important;
+	font-size: 13px !important;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border-right: 2px solid;
+}
+/*
+.numbering-bg{
+	width: 25px;
+	height: 100%;
+	background: gray;
+	margin-left: 160px;
+	position: absolute;
+	z-index: 10;
+}
