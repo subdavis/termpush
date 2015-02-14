@@ -1,3 +1,6 @@
+/* 
+Styles relating to the left pane
+*/
 .pane-left{
 	margin-left: 0px;
 	width: 160px;
@@ -5,9 +8,9 @@
 	position: fixed;
 	height: 100%;
 	color: white;
+	font-family: Consolas, monaco, monospace;
 }
 .title{
-	font-family: Consolas, monaco, monospace;
 	font-size: 26px;
 	text-align: center;
 	padding-top: 8px;
@@ -15,7 +18,6 @@
 	border-left: 5px solid;
 }
 .menu-item{
-	font-family: Consolas, monaco, monospace;
 	font-size: 18px;
 	text-align: left;
 	padding-top: 8px;
@@ -33,12 +35,31 @@
 .menu-link:hover{
 	text-decoration: none;
 }
-.sidebar-cmd{
+/*.sidebar-cmd{
 	font-family: Consolas, monaco, monospace;
 	font-size: 12px;
 	padding-left: 6px;
 	padding-top: 15px;
+}*/
+
+/*
+Styles for the recent post area
+*/
+.recent-container{
+	padding: 12px 0px 0px 15px;
+	color:#A1A1A1;
+	border-left: 5px solid;
 }
+.recent-header{
+	line-height: 12px;
+}
+.recent-item{
+	padding:8px 0px 5px 10px;
+	font-size: 11px;
+}
+/*
+Styles For the main content area code.
+*/
 .pane-content{
 	margin-left: 160px;
 	background: #3B3A32;
@@ -46,9 +67,9 @@
 	padding-top: 6px;
 	padding-bottom: 15px;
 	overflow: auto;
+	font-family: Consolas, monaco, monospace;
 }
 .code-table{
-	font-family: Consolas, monaco, monospace;
 	font-size: 15px;
 	color: #E3E3E3;
 	width: 100%;
@@ -70,17 +91,16 @@
     user-select: none;
     border-right: 2px solid;
 }
-/*
-.numbering-bg{
-	width: 25px;
-	height: 100%;
-	background: gray;
-	margin-left: 160px;
-	position: absolute;
-	z-index: 10;
-}*/
+
+/* 
+Custom theme colors for termpush 
+*/
 .red{
 	color:#DE5C9D;
+}
+.live{
+	font-style: bold;
+	font-size: 10px;
 }
 .green{
 	color: #71C671;
