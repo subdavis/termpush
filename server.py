@@ -29,9 +29,20 @@ def termthread(sh, man, thisID, db):
     print thisID + " closed the connection"
 
 #This will be created as a new thread for WEB clients
-def webthread(SockHandler, man, thisID, db):
+def webthread(sh, man, thisID, db):
     #don't even call this yet.  It isn't ready
-    print "don't use me"
+    while True:
+        message = sh.rcvNext() #try catch in the message object asshat
+        if not (message == "\0"):
+            #What should we do with a second message from web?
+            print "gotz a message!"
+        else: break
+
+    sh.close()
+    del sh
+    man.delWeb(thisID, sh.getConn())
+    print "Web at ID " + thisID + " closed the connection"
+
 
 #obvs for unique IDs    
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -109,7 +120,15 @@ if __name__=="__main__":
         #check to see what kind of connection.
         #rewritten to use the new SockHandler Class and protocol
         sh = SocketHandler(conn)
-        greeting = sh.rcvNext() #returns message OBJECT.
+        greeting = sh.rcvNext() #returns message OBJECT. 
+        #should throw an error we can catch here leter
+
+        #temporary error checking.
+        if type(greeting) == type(" "): 
+            #if client isn't formatting messages properly.
+            print "I don't like this connection"
+            conn.close()
+            continue
 
         if greeting.getType() == "NEWTERM":
             thisID = idGenerator()
@@ -121,7 +140,9 @@ if __name__=="__main__":
             db.addID(thisID)
             start_new_thread(termthread ,(sh, m, thisID, db))
         elif greeting.getType() == "NEWWEB":
+            print "New Web connection!"
             thisID = greeting.getID()
+            m.addWeb(thisID, conn)
             start_new_thread(webthread ,(sh, m, thisID, db))
         else:
             print "Client NOT speaking my protocol."

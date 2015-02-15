@@ -74,3 +74,6 @@ class SocketHandler:
 
     def close(self):
         self.conn.close()
+
+    def getConn(self):
+        return self.conn
