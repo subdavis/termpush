@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import socket
 import getopt
-import sys #for args parsing.
-import subprocess
+import sys 			#for args parsing.
+import subprocess 	#for running commands
 from thread import *
 from sockmanager import *
 
@@ -113,7 +113,6 @@ if __name__=='__main__':
 	uid = greeting.getID()
 	print "View your output at http://termpush.com/" + uid
 
-	msg.wipe()
 	if streamMode == "DEFAULT":
 		#Start reading STDIN to send
 		print "Use ^C to terminate."
