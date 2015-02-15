@@ -18,6 +18,7 @@ def termthread(sh, man, thisID, db):
             if not (man.getWeb(thisID) == None):
                 for c in man.getWeb(thisID):
                     c.send(message.getRaw())
+                    print message.getRaw()
             print message.getRaw()
             db.insertLine(message.getRaw())
         else: break
@@ -38,9 +39,9 @@ def webthread(sh, man, thisID, db):
             print "gotz a message!"
         else: break
 
+    man.delWeb(thisID, sh.getConn())
     sh.close()
     del sh
-    man.delWeb(thisID, sh.getConn())
     print "Web at ID " + thisID + " closed the connection"
 
 

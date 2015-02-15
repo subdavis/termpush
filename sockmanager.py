@@ -63,6 +63,7 @@ class SocketHandler:
         while (self.buff.find('\n') == -1):
             #this will be where each thread should hang and wait for data
             data = self.conn.recv(1024)
+            print data 
             if not data:
                 #called if connection closes.
                 return "\0"
