@@ -72,12 +72,14 @@ if __name__=='__main__':
 			assert False, "Unhandles args"
 	if len(cmdarr) == 0:
 		#there was no command passed, check for file paths.
-		inFilePath = sys.argv[len(sys.argv)-1]
-		try:
-			filein = open(inFilePath)
-			streamMode = "FILE"
-		except:
-			print "Couldn't find file " + inFilePath
+		if len(sys.argv) > 1:
+			print len(sys.argv)
+			inFilePath = sys.argv[len(sys.argv)-1]
+			try:
+				filein = open(inFilePath)
+				streamMode = "FILE"
+			except:
+				print "Couldn't find file " + inFilePath
 
 	#===============================================================
 	#				Setup variables and start the connection
