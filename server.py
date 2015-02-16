@@ -1,3 +1,4 @@
+from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 import socket
 import sys
 import string
@@ -17,7 +18,7 @@ def termthread(sh, man, thisID, db):
             #find the right recipients
             if not (man.getWeb(thisID) == None):
                 for c in man.getWeb(thisID):
-                    c.send(message.getRaw())
+                    c.sendMessage(message.getRaw())
                     print message.getRaw()
             print message.getRaw()
             db.insertLine(message.getRaw())
@@ -85,18 +86,12 @@ class ConManager:
             return self.termCons[uid]
         else: return None
 
-#===============================================================
-#               Begin the main program
-#===============================================================
-if __name__=="__main__":
-    
+def startTCP(m, db):
+    #do sock creation
     HOST = ''   # Symbolic name meaning all available interfaces
     PORT = 8888 # Arbitrary non-privileged port
      
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    m = ConManager() #this will store and fetch active connections based on a unique ID
-    db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
-
     print 'Socket created'
      
     #Bind socket to local host and port
@@ -127,25 +122,54 @@ if __name__=="__main__":
         #temporary error checking.
         if type(greeting) == type(" "): 
             #if client isn't formatting messages properly.
-            print "I don't like this connection"
+            print "Bad Greeting Formatting: Not JSON"
             conn.close()
             continue
 
         if greeting.getType() == "NEWTERM":
             thisID = idGenerator()
-            reply = MsgGen()
+            reply = MsgGen(True)
             reply.newTermReply(thisID)
             reply = reply.pack()
             conn.send(reply)
             m.addTerm(thisID, conn)
             db.addID(thisID)
             start_new_thread(termthread ,(sh, m, thisID, db))
-        elif greeting.getType() == "NEWWEB":
-            print "New Web connection!"
-            thisID = greeting.getID()
-            m.addWeb(thisID, conn)
-            start_new_thread(webthread ,(sh, m, thisID, db))
         else:
-            print "Client NOT speaking my protocol."
+            print "Bad Geeting: JSON with incorrect fields"
 
     s.close()
+
+class WSServer(WebSocket):
+
+    def handleMessage(self):
+        if self.data is None:
+            self.data = ''
+
+        msgObj = Message(self.data, False)
+        m.addWeb(msgObj.getID() , self)
+        # echo message back to client
+        self.sendMessage(str(self.data))
+
+    def handleConnected(self):
+        print self.address, 'connected'
+
+    def handleClose(self):
+        print self.address, 'closed'
+
+#===============================================================
+#               Begin the main program
+#===============================================================
+if __name__=="__main__":
+
+    global m
+    global db
+    
+    m = ConManager() #this will store and fetch active connections based on a unique ID
+    db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
+
+    #start the normal sock thread
+    start_new_thread(startTCP, (m, db))
+    #Start WS server
+    ws = SimpleWebSocketServer("", 8000, WSServer)
+    ws.serveforever()

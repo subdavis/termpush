@@ -93,7 +93,7 @@ if __name__=='__main__':
 	#in the event we want to listen to socket input asynchranously.  
 	#async = Async()
 	#this will be recycled for each line of input.  Dont waste memory!
-	msg = MsgGen()
+	msg = MsgGen(True)
 	sh = SocketHandler(csock)
 
 	#===============================================================
@@ -101,7 +101,7 @@ if __name__=='__main__':
 	#===============================================================
 
 	#let's write a message to introduce ourselves to the server.
-	firstMessage = MsgGen()
+	firstMessage = MsgGen(True)
 	firstMessage.newTerm()
 	firstMessage = firstMessage.pack()
 	csock.send(firstMessage)

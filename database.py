@@ -16,4 +16,3 @@ class Database:
 		print "Created new ID " + uid
 	def insertLine(self, line):
 		retrn = self.db[self.col].insert(json.loads(line))
-		print retrn
