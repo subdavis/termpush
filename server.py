@@ -147,7 +147,8 @@ class WSServer(WebSocket):
             self.data = ''
 
         msgObj = Message(self.data, False)
-        m.addWeb(msgObj.getID() , self)
+        self.uid = msgObj.getID()
+        m.addWeb(self.uid , self)
         # echo message back to client
         self.sendMessage(str(self.data))
 
@@ -155,6 +156,7 @@ class WSServer(WebSocket):
         print self.address, 'connected'
 
     def handleClose(self):
+        m.delWeb(self.uid, self)
         print self.address, 'closed'
 
 #===============================================================

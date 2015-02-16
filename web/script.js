@@ -2,6 +2,7 @@
 
 function socket(){
 	var connection = new WebSocket('ws://ocean.redspin.net:8000');
+	var index = 0
 
 	connection.onopen = function () {
 	  //connection.send('Ping'); // Send the message 'Ping' to the server
@@ -16,10 +17,13 @@ function socket(){
 
 	// Log messages from the server
 	connection.onmessage = function (e) {
-	  alert('Server: ' + JSON.stringify(e.data));
+	  //alert('Server: ' + JSON.stringify(e.data));
 	  console.log(e)
 	  console.log(e.data)
+	  addRow(JSON.parse(e.data).message, index)
+	  index++;
 	};
+	
 	function welcomeGen(){
 	var id = window.location.pathname
 	var welcome = '{ "message" : "None",' +
@@ -28,6 +32,16 @@ function socket(){
 		'}';
 	return welcome;
 	};
+
+	function addRow(line, index){
+		var table = document.getElementById("code-table");
+	    var row = table.insertRow(-1);
+	    var cell1 = row.insertCell(0);
+	    var cell2 = row.insertCell(1);
+	    cell1.className = "numbering";
+	    cell1.innerHTML = index;
+	    cell2.innerHTML = line;
+	}
 }
 
 /*
