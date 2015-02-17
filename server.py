@@ -1,59 +1,43 @@
-from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 import socket
 import sys
 import string
 import random
 from thread import *
 #These are my custom-written helper classes.
-from sockmanager import *
-from database import Database
+from tputils.database import *
+from tputils.sockmanager import *
+#thanks to https://github.com/opiate/SimpleWebSocketServer
+from websocket.SimpleWebSocketServer import *
 
 #This will be created as a new thread for TERM clients
-def termthread(sh, man, thisID, db):
+def termthread(sockhandler, thisID):
     #infinite loop so that function do not terminate and thread do not end.
     while True:
         #Receiving from client
-        message = sh.rcvNext()
+        message = sockhandler.rcvNext()
         if not (message == "\0"):
-            #find the right recipients
-            if not (man.getWeb(thisID) == None):
-                for c in man.getWeb(thisID):
+            print message.getLine()
+            #find the right recipients with sockhandler
+            if not (global_connection_manager.getWeb(thisID) == None):
+                for c in global_connection_manager.getWeb(thisID):
                     c.sendMessage(message.getRaw())
-                    print message.getRaw()
-            print message.getRaw()
-            db.insertLine(message.getRaw())
+            global_db.insertLine(message.getRaw())
         else: break
      
     #Come out of loop
-    sh.close() # tell the handler to close the connection
-    del sh # remove the handler
-    man.delTerm(thisID)
+    sockhandler.close() #tell the handler to close the connection
+    del sockhandler # remove the handler
+    global_connection_manager.delTerm(thisID)
     print thisID + " closed the connection"
-
-#This will be created as a new thread for WEB clients
-def webthread(sh, man, thisID, db):
-    #don't even call this yet.  It isn't ready
-    while True:
-        message = sh.rcvNext() #try catch in the message object asshat
-        if not (message == "\0"):
-            #What should we do with a second message from web?
-            print "gotz a message!"
-        else: break
-
-    man.delWeb(thisID, sh.getConn())
-    sh.close()
-    del sh
-    print "Web at ID " + thisID + " closed the connection"
-
 
 #obvs for unique IDs    
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 class ConManager:
-    #This class is for keeping together multiple web connections on the same feed
+    #This class is for keeping association between client sockets and websockets
     #Rememebr what web clients want what data.
-    #maybe make this singleton later?  I'll only ever have one, then I wont have to pass the fucker around as an arg.
+    #kept as a global variable for now.  No harm :)
 
     def __init__(self):
         self.webCons = {'000000' : None}
@@ -68,6 +52,7 @@ class ConManager:
     
     def delWeb(self, uid, conn):
         #assumes at least one connection exists in webCons 
+        #else why the hell would we be removing it?
         self.webCons[uid].remove(conn)
 
     def getWeb(self, uid):
@@ -86,7 +71,7 @@ class ConManager:
             return self.termCons[uid]
         else: return None
 
-def startTCP(m, db):
+def startTCP():
     #do sock creation
     HOST = ''   # Symbolic name meaning all available interfaces
     PORT = 8888 # Arbitrary non-privileged port
@@ -115,9 +100,9 @@ def startTCP(m, db):
         
         #check to see what kind of connection.
         #rewritten to use the new SockHandler Class and protocol
-        sh = SocketHandler(conn)
-        greeting = sh.rcvNext() #returns message OBJECT. 
-        #should throw an error we can catch here leter
+        sockhandler = SocketHandler(conn)
+        greeting = sockhandler.rcvNext() #returns message OBJECT. 
+        #sockhandlerould throw an error we can catch here leter
 
         #temporary error checking.
         if type(greeting) == type(" "): 
@@ -132,9 +117,9 @@ def startTCP(m, db):
             reply.newTermReply(thisID)
             reply = reply.pack()
             conn.send(reply)
-            m.addTerm(thisID, conn)
-            db.addID(thisID)
-            start_new_thread(termthread ,(sh, m, thisID, db))
+            global_connection_manager.addTerm(thisID, conn)
+            global_db.addID(thisID)
+            start_new_thread(termthread ,(sockhandler, thisID))
         else:
             print "Bad Geeting: JSON with incorrect fields"
 
@@ -146,17 +131,15 @@ class WSServer(WebSocket):
         if self.data is None:
             self.data = ''
 
-        msgObj = Message(self.data, False)
-        self.uid = msgObj.getID()
-        m.addWeb(self.uid , self)
-        # echo message back to client
-        self.sendMessage(str(self.data))
+        message = Message(self.data, False)
+        self.uid = message.getID()
+        global_connection_manager.addWeb(self.uid , self)
 
     def handleConnected(self):
-        print self.address, 'connected'
+        print "Web Connection from " , self.address
 
     def handleClose(self):
-        m.delWeb(self.uid, self)
+        global_connection_manager.delWeb(self.uid, self)
         print self.address, 'closed'
 
 #===============================================================
@@ -164,14 +147,14 @@ class WSServer(WebSocket):
 #===============================================================
 if __name__=="__main__":
 
-    global m
-    global db
+    global global_connection_manager
+    global global_db
     
-    m = ConManager() #this will store and fetch active connections based on a unique ID
-    db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
+    global_connection_manager = ConManager() #this will store and fetch active connections based on a unique ID
+    global_db = Database() #Make mongo transparent.  No Mongo calls in this file.  Dont be sloppy....
 
     #start the normal sock thread
-    start_new_thread(startTCP, (m, db))
+    start_new_thread(startTCP, ())
     #Start WS server
     ws = SimpleWebSocketServer("", 8000, WSServer)
     ws.serveforever()

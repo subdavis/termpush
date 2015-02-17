@@ -4,7 +4,7 @@ import getopt
 import sys 			#for args parsing.
 import subprocess 	#for running commands
 from thread import *
-from sockmanager import *
+from tputils.sockmanager import *
 
 #this will be called as a thread.  We will ignore this for now.
 def listen(csocket, async):
@@ -111,7 +111,7 @@ if __name__=='__main__':
 
 	#Thought: how do we keep poeple from spamming connection requests?
 	uid = greeting.getID()
-	print "View your output at http://termpush.com/" + uid
+	print "View your output at http://ocean.redspin.net/#" + uid
 
 	if streamMode == "DEFAULT":
 		#Start reading STDIN to send

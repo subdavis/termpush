@@ -3,11 +3,11 @@
 function socket(){
 	var connection = new WebSocket('ws://ocean.redspin.net:8000');
 	var index = 0
+	var parser = document.createElement('a');
 
 	connection.onopen = function () {
 	  //connection.send('Ping'); // Send the message 'Ping' to the server
 	  connection.send(welcomeGen())
-	  alert("connected!");
 	};
 
 	// Log errors
@@ -20,15 +20,17 @@ function socket(){
 	  //alert('Server: ' + JSON.stringify(e.data));
 	  console.log(e)
 	  console.log(e.data)
-	  addRow(JSON.parse(e.data).message, index)
-	  index++;
+	  if ((e.data).message != ""){
+		  addRow(JSON.parse(e.data).message, index)
+		  index++;
+	  }
 	};
 	
 	function welcomeGen(){
-	var id = window.location.pathname
+	var id = window.location.hash
 	var welcome = '{ "message" : "None",' +
 		' "type" : "NEWWEB" ,' +
-		' "uid" : "' + prompt("ID?") + '"' +
+		' "uid" : "' + id.substring(1) + '"' +
 		'}';
 	return welcome;
 	};

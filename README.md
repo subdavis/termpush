@@ -3,11 +3,11 @@ This is a project started by @subdavis for sending output from a console to the 
 
 ###Uses:
 ```
-~$ somecommand | termpush 
+~$ termpush -c ping google.com
 ```
 Watch page update in realtime as your terminal process runs.
 ```
-~$ cat somefile | termpush 
+~$ termpush somefile.txt
 ```
 Quick and easy way to publish a paste and get a link all in one command
 
@@ -21,3 +21,4 @@ Quick and easy way to publish a paste and get a link all in one command
 * Password protect pages.
 * Allow users to "rebind" to pages they own and push more output.  
 * Allow editing of pages
+* Allow rerunning the command from web
