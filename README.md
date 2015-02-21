@@ -1,9 +1,11 @@
 # termpush
-This is a project started by @subdavis for sending output from a console to the web in real time.  It will generate a link and feed all future output to that link (like pastebin)
+This is a project started by @subdavis for sending output from a console to the web in real time.  It will generate a link and feed all future output to that link (like pastebin).
+
+Sorry for the terrible documentation.  As I do more in-depth testing for all the features, I'll improve these instructions.
 
 ###Uses:
 ```
-~$ termpush -c ping google.com
+~$ termpush -c 'ping google.com'
 ```
 Watch page update in realtime as your terminal process runs.
 ```
@@ -11,12 +13,15 @@ Watch page update in realtime as your terminal process runs.
 ```
 Quick and easy way to publish a paste and get a link all in one command.  
 
-###Install (linux):
+###Install (linux $ mac):
 ```
 ~$ git clone https://github.com/suBDavis/termpush
 ~$ ln -s termpush.py /usr/bin/termpush.py
 ~$ chmod +x termpush.py
 ```
+###Use without install (all):
+1. Clone the repo.
+2. run 'python termpush.py args'
 
 ###Planned Features:
 * Feed any command line output to a webpage
