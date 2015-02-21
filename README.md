@@ -9,7 +9,14 @@ Watch page update in realtime as your terminal process runs.
 ```
 ~$ termpush somefile.txt
 ```
-Quick and easy way to publish a paste and get a link all in one command
+Quick and easy way to publish a paste and get a link all in one command.  
+
+###Install (linux):
+```
+~$ git clone https://github.com/suBDavis/termpush
+~$ ln -s termpush.py /usr/bin/termpush.py
+~$ chmod +x termpush.py
+```
 
 ###Planned Features:
 * Feed any command line output to a webpage
