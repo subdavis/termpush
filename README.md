@@ -13,7 +13,7 @@ Watch page update in realtime as your terminal process runs.
 ```
 Quick and easy way to publish a paste and get a link all in one command.  
 
-###Install (linux $ mac):
+###Install (linux & mac):
 ```
 ~$ git clone https://github.com/suBDavis/termpush
 ~$ ln -s termpush.py /usr/bin/termpush.py
