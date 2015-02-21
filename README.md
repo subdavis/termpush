@@ -16,10 +16,12 @@ Quick and easy way to publish a paste and get a link all in one command.
 ###Install (linux & mac):
 ```
 ~$ git clone https://github.com/suBDavis/termpush
-~$ ln -s termpush.py /usr/bin/termpush.py
+~$ cd termpush
 ~$ chmod +x termpush.py
 ```
-###Use without install (all):
+Followed by however you generally add a script to your path.  Note that termpush.py relies on files in tputils.
+
+###Use without install (all)(recommended for now):
 1. Clone the repo.
 2. run 'python termpush.py args'
 
