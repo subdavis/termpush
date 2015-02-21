@@ -16,3 +16,6 @@ class Database:
 		print "Created new ID " + uid
 	def insertLine(self, line):
 		retrn = self.db[self.col].insert(json.loads(line))
+	def getHistory(self, uid_1):
+		result = self.db[self.col].find( { "uid": uid_1} , { "_id":0} )
+		return result

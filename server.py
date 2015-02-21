@@ -1,5 +1,6 @@
 import socket
 import sys
+import json
 import string
 import random
 from thread import *
@@ -133,7 +134,20 @@ class WSServer(WebSocket):
 
         message = Message(self.data, False)
         self.uid = message.getID()
-        global_connection_manager.addWeb(self.uid , self)
+        self.type = message.getType()
+        
+        if self.type == "NEWWEB":
+            global_connection_manager.addWeb(self.uid , self)
+            print "Web connection named " + self.uid + " auth succeded!"
+        
+            #Now let's send it everything we've ever received for this ID.
+            query = global_db.getHistory(self.uid)
+
+            for entry in query:
+            	#have to get a JSON object from whatever the fuck mongo delivers.
+            	toJSON = json.dumps(entry)
+                self.sendMessage(str(toJSON))
+        
 
     def handleConnected(self):
         print "Web Connection from " , self.address
@@ -157,4 +171,7 @@ if __name__=="__main__":
     start_new_thread(startTCP, ())
     #Start WS server
     ws = SimpleWebSocketServer("", 8000, WSServer)
-    ws.serveforever()
+    try:
+        ws.serveforever()
+    except:
+        print "Terminated!"

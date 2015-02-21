@@ -7,7 +7,7 @@ function socket(){
 
 	connection.onopen = function () {
 	  //connection.send('Ping'); // Send the message 'Ping' to the server
-	  connection.send(welcomeGen())
+	  connection.send(welcomeGen());
 	};
 
 	// Log errors
@@ -18,10 +18,15 @@ function socket(){
 	// Log messages from the server
 	connection.onmessage = function (e) {
 	  //alert('Server: ' + JSON.stringify(e.data));
-	  console.log(e)
-	  console.log(e.data)
-	  if ((e.data).message != ""){
-		  addRow(JSON.parse(e.data).message, index)
+	  console.log(e);
+	  console.log(e.data);
+	  if (JSON.parse(e.data).type == "INIT"){
+	  	//do the thing?
+	  	addRow(JSON.parse(e.data).message, index);
+		index++;
+	  }
+	  else if (JSON.parse(e.data).type == "NORMAL"){
+		  addRow(JSON.parse(e.data).message, index);
 		  index++;
 	  }
 	};
@@ -40,35 +45,8 @@ function socket(){
 	    var row = table.insertRow(-1);
 	    var cell1 = row.insertCell(0);
 	    var cell2 = row.insertCell(1);
-	    cell1.className = "numbering";
+	    cell1.className = "numbering ::selection";
 	    cell1.innerHTML = index;
-	    cell2.innerHTML = line;
+	    cell2.innerHTML = "<script type='text/plain'>" + line + "</script>";
 	}
 }
-
-/*
-function socket(){
-	var uri = "ws://ocean.redspin.net:8081";
-	ws = new Websock();
-	ws.open(uri);
-	ws.on('open', function (e) {
-        alert("Connected");
-        ws.send(welcomeGen());
-    });
-    ws.on('message', function (e) {
-        alert("Received: " + ws.rQshiftStr());
-    });
-    ws.on('close', function (e) {
-        alert("Disconnected");
-    });
-}
-function welcomeGen(){
-	var id = window.location.pathname
-	var welcome = '{ "message" : "None",' +
-		' "type" : "NEWWEB" ,' +
-		' "uid" : "' + prompt("ID?") + '"' +
-		'}';
-	alert(welcome)
-	return welcome;
-}
-*/
